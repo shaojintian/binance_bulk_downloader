@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 """
 Binance Bulk Downloader
 """
@@ -14,6 +15,7 @@ from rich import print
 from rich.progress import track
 import re
 from datetime import datetime
+import polars as pl
 
 
 
@@ -304,6 +306,13 @@ class BinanceBulkDownloader:
         # Delete zip file
         os.remove(zip_destination_path)
         print(f"[green]Removed: {zip_destination_path}[/green]")
+        #
+        # 将csv文件转换为parquet文件
+        print(f"[bold blue]Converting {csv_destination_path} to parquet[/bold blue]")
+        df = pl.read_csv(csv_destination_path)
+        df.write_parquet(csv_destination_path.replace(".csv", ".parquet"))
+        print(f"[green]Converted: {csv_destination_path}[/green]")
+
 
     @staticmethod
     def make_chunks(lst, n) -> list:
@@ -370,6 +379,3 @@ class BinanceBulkDownloader:
         except Exception as e:
             print(f"[red]Error parsing date from file: {key} - {e}[/red]")
             return False
-
-
-
